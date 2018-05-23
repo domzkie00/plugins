@@ -6,6 +6,7 @@
     $token                = isset($g2inf_settings['token']) ? $g2inf_settings['token'] : '';
     $tags                = isset($g2inf_settings['tags']) ? $g2inf_settings['tags'] : '';
     $custom_fields                = isset($g2inf_settings['custom_fields']) ? $g2inf_settings['custom_fields'] : '';
+    $products                = isset($g2inf_settings['products']) ? $g2inf_settings['products'] : '';
 ?>
 <table class="form-table">
     <tbody>
@@ -49,6 +50,14 @@
                 <textarea rows="5" readonly="" name="g2inf_settings[custom_fields]"><?= $custom_fields ?></textarea>
             </td>
         </tr>
+        <tr class="form-field form-required term-name-wrap">
+            <th scope="row">
+                <label>Products</label>
+            </th>
+            <td>
+                <textarea rows="5" readonly="" name="g2inf_settings[products]"><?= $products ?></textarea>
+            </td>
+        </tr>
     </tbody>
 </table>
 <p>
@@ -61,6 +70,10 @@
 
         <?php if (!empty($token)): ?>
         <a href="<?= admin_url( 'admin.php?page=g2inf-settings&g2infsettingsaction=synccustomfields' ); ?>" class="button button-secondary">Sync Custom Fields</a>
+        <?php endif; ?>
+
+        <?php if (!empty($token)): ?>
+        <a href="<?= admin_url( 'admin.php?page=g2inf-settings&g2infsettingsaction=syncproducts' ); ?>" class="button button-secondary">Sync Products</a>
         <?php endif; ?>
 
     <?php endif; ?>

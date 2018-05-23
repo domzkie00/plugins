@@ -16,6 +16,7 @@ class G2inf{
     function __construct(){
         add_action('admin_enqueue_scripts', array( $this, 'admin_scripts' ));
         add_action('wp_enqueue_scripts', array($this, 'public_scripts'));
+        add_action('wp_ajax_set_infusion_products_use_status', array($this, 'set_infusion_products_use_status_ajax'));
     }
 
     public function admin_scripts($hook){
@@ -43,9 +44,29 @@ class G2inf{
 
         wp_register_style('g2inf-admin-style', G2INF_URL . '/assets/css/g2inf-admin-style.css', '1.0', true );
         wp_enqueue_style('g2inf-admin-style');
+
+        wp_register_style('datatable-css', G2INF_URL . '/assets/css/datatable.css', '1.0', true );
+        wp_enqueue_style('datatable-css');
+        wp_register_script('datatable-js', G2INF_URL . '/assets/js/datatable.js', '1.0', true, true );
+        wp_enqueue_script('datatable-js');
+
+        wp_register_script('custom-js', G2INF_URL . '/assets/js/custom.js', '1.0', true);
+        $g2inf_admin_script = array(
+            'ajaxurl' => admin_url( 'admin-ajax.php' )
+        );
+        wp_localize_script('custom-js', 'g2inf_admin_script', $g2inf_admin_script );
+        wp_enqueue_script('custom-js');
     }
 
     public function public_scripts(){
 
+    }
+
+    public function set_infusion_products_use_status_ajax() {
+        $g2inf_settings = get_option('g2inf_settings');
+        $g2inf_settings['products_use_status'] = $_POST['data'];
+        update_option( 'g2inf_settings', $g2inf_settings );
+        echo $_POST['data'];
+        die();
     }
 }

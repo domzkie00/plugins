@@ -8,6 +8,7 @@ class G2inf_Settings {
         add_action('admin_init', array( $this, 'get_access_token' ));
         add_action('admin_init', array( $this, 'get_infusionsoft_tags' ));
         add_action('admin_init', array( $this, 'get_custom_fields' ));
+        add_action('admin_init', array( $this, 'get_products' ));
     }
 
     public function register_settings() {
@@ -15,7 +16,17 @@ class G2inf_Settings {
     }
 
     public function admin_menus(){
+        add_submenu_page ( 'edit.php?post_type=birchtree_g2inf' , 'Add-Ons' , 'Add-Ons' , 'manage_options' , 'g2inf-addons' , array( $this , 'g2inf_addons_page' ));
         add_submenu_page ( 'edit.php?post_type=birchtree_g2inf' , 'Settings' , 'Settings' , 'manage_options' , 'g2inf-settings' , array( $this , 'g2inf_settings_page' ));
+    }
+
+    public function g2inf_addons_page() {
+        if (isset($_GET['g2infregistration']) && $_GET['g2infregistration'] == 'true') {
+            include_once(G2INF_PATH_INCLUDES . '/g2inf_register_account.php');
+        } else {
+            $g2inf_settings = get_option('g2inf_settings');
+            include_once(G2INF_PATH_INCLUDES . '/g2inf-addons.php');
+        }
     }
 
     public function g2inf_settings_page() {
@@ -121,6 +132,42 @@ class G2inf_Settings {
             );
         
             $g2inf_settings['custom_fields'] = $response['body'];
+                
+            update_option( 'g2inf_settings', $g2inf_settings );
+            header('Location: ' . admin_url( 'admin.php?page=g2inf-settings' ));
+
+        endif;
+    }
+
+    public function get_products() {
+        if (isset($_GET['g2infsettingsaction']) && $_GET['g2infsettingsaction'] == 'syncproducts'):
+            $g2inf_settings = get_option('g2inf_settings');
+            $client_id            = isset($g2inf_settings['client_id']) ? $g2inf_settings['client_id'] : '';
+            $client_secret        = isset($g2inf_settings['client_secret']) ? $g2inf_settings['client_secret'] : '';
+            $token                = isset($g2inf_settings['token']) ? $g2inf_settings['token'] : '';
+
+            if (!$client_id || !$client_secret)
+                return;
+
+            $infusionsoft = new \Infusionsoft\Infusionsoft(array(
+                'clientId'     => $client_id,
+                'clientSecret' => $client_secret,
+                'redirectUri'  => admin_url( 'admin.php?page=g2inf-settings&g2infsettingsaction=getaccesstoken' ),
+            ));
+
+            $serialized_token = unserialize($token);
+            $customfield_api_url = $infusionsoft->products()->full_url;
+            $response = wp_remote_get(
+                $customfield_api_url.'?access_token='.$serialized_token->accessToken,
+                array(
+                    'timeout' => 120,
+                    'httpversion' => '1.1' 
+                )
+            );
+
+            $obj = json_decode($response['body']);
+            $result = json_encode($obj->products);
+            $g2inf_settings['products'] = $result;
                 
             update_option( 'g2inf_settings', $g2inf_settings );
             header('Location: ' . admin_url( 'admin.php?page=g2inf-settings' ));
