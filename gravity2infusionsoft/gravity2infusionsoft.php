@@ -59,6 +59,7 @@ if (!class_exists('g2inf')):
     require_once(G2INF_PATH_CLASS . '/g2inf-main.class.php');
     require_once(G2INF_PATH_CLASS . '/g2inf-post-type.class.php');
     require_once(G2INF_PATH_CLASS . '/g2inf-settings.class.php');
+    require_once(G2INF_PATH_CLASS . '/g2inf-custom-form-fields.class.php');
     require_once(G2INF_PATH_CLASS . '/g2inf-merges.class.php');
     require_once(G2INF_PATH_CLASS . '/g2inf-meta-boxes.class.php');
     require_once(G2INF_PATH_CLASS . '/g2inf-processing.class.php');
