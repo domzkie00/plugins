@@ -64,6 +64,7 @@ if (!class_exists('g2inf')):
     require_once(G2INF_PATH_CLASS . '/g2inf-meta-boxes.class.php');
     require_once(G2INF_PATH_CLASS . '/g2inf-processing.class.php');
     require_once(G2INF_PATH_CLASS . '/g2inf-license-handler.class.php');
+    require_once(G2INF_PATH_CLASS . '/g2inf-products.class.php');
     require_once(G2INF_PATH_INCLUDES . '/functions.php');
 
     /* Intitialize licensing

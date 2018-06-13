@@ -49,10 +49,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach($arr_prod as $prod) { ?>
+                        <?php 
+                            foreach($arr_prod as $prod) { 
+                                $allSpaces = false;
+                                if (strlen(trim($prod->product_desc)) == 0) {
+                                    $allSpaces = true;
+                                }
+                        ?>
                         <tr>
                             <td><?= $prod->product_name ?></td>
-                            <td><?= $prod->product_desc ? $prod->product_desc : $prod->product_short_desc ?></td>
+                            <td><?= ($prod->product_desc && $allSpaces == false) ? $prod->product_desc : $prod->product_short_desc ?></td>
                             <td><?= $prod->product_price ?></td>
                         </tr>
                         <?php } ?>
