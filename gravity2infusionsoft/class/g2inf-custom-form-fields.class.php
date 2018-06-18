@@ -3,7 +3,7 @@
 class GF_Field_Infusionsoft_Products extends GF_Field {
 
 	public function __construct() {
-		if(!empty($this->getInfusionProducts())) {
+		if(!empty($this->getInfusionProducts()) || $this->getInfusionProducts() != false) {
 			add_filter( 'gform_add_field_buttons', array( $this, 'add_button' ));
             add_action( 'gform_editor_js_set_default_values', array( $this, 'set_defaults'));
 		}
@@ -12,6 +12,10 @@ class GF_Field_Infusionsoft_Products extends GF_Field {
     public function getInfusionProducts() {
     	$g2inf_settings = get_option('g2inf_settings');
 		$products = isset($g2inf_settings['products']) ? $g2inf_settings['products'] : '';
+        $add_fields = isset($g2inf_settings['products_use_status']) ? $g2inf_settings['products_use_status']  : 'false';
+        if($add_fields == 'false') {
+            return false;
+        }
 		return $products;
     }
 
