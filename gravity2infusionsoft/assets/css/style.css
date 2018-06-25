@@ -105,3 +105,25 @@
 #ISCreateCustomer .submit-btn-area button[type='submit'] {
   margin-top: 15px;
 }
+
+#ISCreditCard form {
+  margin-top: 20px;
+}
+#ISCreditCard .loader {
+  display: none;
+  margin: 0px;
+  position: absolute;
+  right: 50px;
+  bottom: 25px;
+  font-size: 8px;
+}
+#ISCreditCard .loader, #ISCreditCard .loader:before, #ISCreditCard .loader:after {
+  color: #6c7863;
+  background: #6c7863;
+}
+#ISCreditCard .submit-btn-area {
+  text-align: right;
+}
+#ISCreditCard .submit-btn-area button[type='submit'] {
+  margin-top: 15px;
+}

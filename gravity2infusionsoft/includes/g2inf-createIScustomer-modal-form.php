@@ -1,4 +1,4 @@
-<div id="ISCreateCustomer" data-backdrop="static" data-keyboard="false" class="modal fade" role="dialog">
+<div id="ISCreateCustomer" data-backdrop="static" data-keyboard="false" class="modal fade ISCreateCustomer" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
