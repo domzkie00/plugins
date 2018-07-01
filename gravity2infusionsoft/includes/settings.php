@@ -15,12 +15,14 @@
     </h2>
 
     <form method="post" action="options.php">
-        <?php settings_fields( 'g2inf_settings' ); ?>
-        <?php do_settings_sections( 'g2inf_settings' ); ?> 
         <?php
             if (isset($_GET['tab']) && $_GET['tab'] == 'licenses') {
+                settings_fields( 'g2inf_licenses' );
+                do_settings_sections( 'g2inf_licenses' );
                 include_once(G2INF_PATH_INCLUDES . '/g2inf-licenses.php');
             } else {
+                settings_fields( 'g2inf_settings' );
+                do_settings_sections( 'g2inf_settings' );
                 include_once(G2INF_PATH_INCLUDES . '/g2inf-settings.php');
             }
         ?>

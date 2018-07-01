@@ -3,10 +3,28 @@
 class GF_Field_Infusionsoft_Products extends GF_Field {
 
 	public function __construct() {
-		if(!empty($this->getInfusionProducts()) || $this->getInfusionProducts() != false) {
-			add_filter( 'gform_add_field_buttons', array( $this, 'add_button' ));
-            add_action( 'gform_editor_js_set_default_values', array( $this, 'set_defaults'));
-		}
+        if($this->licenseKeyValidAndActivated()) {
+    		if(!empty($this->getInfusionProducts()) || $this->getInfusionProducts() != false) {
+    			add_filter( 'gform_add_field_buttons', array( $this, 'add_button' ));
+                add_action( 'gform_editor_js_set_default_values', array( $this, 'set_defaults'));
+    		}
+        }
+    }
+
+    public function licenseKeyValidAndActivated() {
+        $g2inf_licenses = get_option('g2inf_licenses');
+        if(!empty($g2inf_licenses)) {
+            foreach($g2inf_licenses as $key => $val) {
+                if (strpos($key, '_license_key') !== false) {
+                    $key = str_replace("_license_key", "_license_active" , $key);
+                    if(get_option($key)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     public function getInfusionProducts() {

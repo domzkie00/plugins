@@ -12,6 +12,22 @@ class G2inf_Products{
         add_action('wp_ajax_createContactCCardToIS', array($this, 'createContactCCardToIS_ajax'));
     }
 
+    public function licenseKeyValidAndActivated() {
+        $g2inf_licenses = get_option('g2inf_licenses');
+        if(!empty($g2inf_licenses)) {
+            foreach($g2inf_licenses as $key => $val) {
+                if (strpos($key, '_license_key') !== false) {
+                    $key = str_replace("_license_key", "_license_active" , $key);
+                    if(get_option($key)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     public function refreshISToken() {
         $g2inf_settings = get_option('g2inf_settings');
         $client_id            = isset($g2inf_settings['client_id']) ? $g2inf_settings['client_id'] : '';
@@ -50,55 +66,68 @@ class G2inf_Products{
             var multi_posts = null;
             var validate_IS_ccard_modal = null;
             var contact_id = null;
+            var valid_license_key = true;
         </script><?php
 
         if (!is_admin()) {
-            $checkISForCurrentUser = $this->checkISifUserExists();
-            $modal = file_get_contents(G2INF_PATH_INCLUDES . '/g2inf-createIScustomer-modal-form.php');
-            $checkout_modal = file_get_contents(G2INF_PATH_INCLUDES . '/g2inf-validateIScreditcard-modal-form.php');
+            if($this->licenseKeyValidAndActivated()) {
+                $checkISForCurrentUser = $this->checkISifUserExists();
+                $cid = null;
+                if(isset($checkISForCurrentUser[0]['Id'])) {
+                    $cid = $checkISForCurrentUser[0]['Id'];
+                }
+                $modal = file_get_contents(G2INF_PATH_INCLUDES . '/g2inf-createIScustomer-modal-form.php');
+                $checkout_modal = file_get_contents(G2INF_PATH_INCLUDES . '/g2inf-validateIScreditcard-modal-form.php');
 
-            ?>
-                <script>
-                    validate_IS_ccard_modal = <?php echo json_encode($checkout_modal) ?>;
-                    contact_id = <?php echo json_encode($checkISForCurrentUser[0]['Id']) ?>;
-                </script>
-            <?php
-
-            if(!$checkISForCurrentUser && $checkISForCurrentUser != 'ignore') {
-                $mapped_email = $this->getMappedContactEmail();
                 ?>
                     <script>
-                        create_IS_customer_modal = <?php echo json_encode($modal) ?>;
-                        mapped_email = <?php echo json_encode($mapped_email) ?>;
+                        validate_IS_ccard_modal = <?php echo json_encode($checkout_modal) ?>;
+                        contact_id = <?php echo json_encode($cid) ?>;
                     </script>
                 <?php
-            }
 
-            if($checkISForCurrentUser == 'ignore') {
-                global $posts;
-
-                $multi_posts = [];
-                foreach($posts as $p) {
-                    $mapped_email = $this->getMappedContactEmail($p);
-                    $checkISForCurrentUser = $this->checkISifUserExists($mapped_email);
-
-                    if(isset($checkISForCurrentUser[0]['Id'])) {
-                        $checkISForCurrentUser = $checkISForCurrentUser[0]['Id'];
-                    } else {
-                        $checkISForCurrentUser = 'No IS record found.';
-                    }
-
-                    $arr = [];
-                    $arr['id'] = $p->ID;
-                    $arr['mapped_email'] = $mapped_email;
-                    $arr['is_id'] = $checkISForCurrentUser;
-                    $multi_posts[] = $arr;
+                if(!$checkISForCurrentUser && $checkISForCurrentUser != 'ignore') {
+                    $mapped_email = $this->getMappedContactEmail();
+                    ?>
+                        <script>
+                            create_IS_customer_modal = <?php echo json_encode($modal) ?>;
+                            mapped_email = <?php echo json_encode($mapped_email) ?>;
+                        </script>
+                    <?php
                 }
 
+                if($checkISForCurrentUser == 'ignore') {
+                    global $posts;
+
+                    $multi_posts = [];
+                    foreach($posts as $p) {
+                        $mapped_email = $this->getMappedContactEmail($p);
+                        $checkISForCurrentUser = $this->checkISifUserExists($mapped_email);
+
+                        if(isset($checkISForCurrentUser[0]['Id'])) {
+                            $checkISForCurrentUser = $checkISForCurrentUser[0]['Id'];
+                        } else {
+                            $checkISForCurrentUser = 'No IS record found.';
+                        }
+
+                        $arr = [];
+                        $arr['id'] = $p->ID;
+                        $arr['mapped_email'] = $mapped_email;
+                        $arr['is_id'] = $checkISForCurrentUser;
+                        $multi_posts[] = $arr;
+                    }
+
+                    ?>
+                        <script>
+                            create_IS_customer_modal = <?php echo json_encode($modal) ?>;
+                            multi_posts = <?php echo json_encode($multi_posts) ?>;
+                        </script>
+                    <?php
+                }
+            } else {
                 ?>
                     <script>
-                        create_IS_customer_modal = <?php echo json_encode($modal) ?>;
-                        multi_posts = <?php echo json_encode($multi_posts) ?>;
+                        valid_license_key = false;
                     </script>
                 <?php
             }

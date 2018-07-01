@@ -34,44 +34,55 @@ jQuery(document).ready(function ($) {
 		}
 	});
 
-	if(create_IS_customer_modal) {
-		if(multi_posts) {
-			$.each(multi_posts, function(){
-				if(this['is_id'] == 'No IS record found.' && this['mapped_email']) {
-					$(create_IS_customer_modal).appendTo('body');
+	if(valid_license_key) {
+		if(create_IS_customer_modal) {
+			if(multi_posts) {
+				$.each(multi_posts, function(){
+					if(this['is_id'] == 'No IS record found.' && this['mapped_email']) {
+						$(create_IS_customer_modal).appendTo('body');
 
-					setTimeout(function(){
-						var createISCustomerModal = $('#ISCreateCustomer');
-						createISCustomerModal.removeAttr('data-backdrop');
-						createISCustomerModal.removeAttr('data-keyboard');
-					}, 200);
+						setTimeout(function(){
+							var createISCustomerModal = $('#ISCreateCustomer');
+							createISCustomerModal.removeAttr('data-backdrop');
+							createISCustomerModal.removeAttr('data-keyboard');
+						}, 200);
 
-					var p_id = this['id'];
-					var email = this['mapped_email'];
-					$('article').each(function(){
-						var art_id = $(this).attr('id');
-						var exp = art_id.split('-');
-						art_id = parseInt(exp[1]);
-						
-						if(p_id == art_id) {
-							$(this).attr('data-ismapped-email', email);
-						}
-					});
-				}
-			});
-		} else {
-			$(create_IS_customer_modal).appendTo('body');
-
-			setTimeout(function(){
-				var createISCustomerModal = $('#ISCreateCustomer');
-				createISCustomerModal.find('.mapped-email').text(mapped_email);
-				createISCustomerModal.find('#email').val(mapped_email);
-				createISCustomerModal.modal('show');
+						var p_id = this['id'];
+						var email = this['mapped_email'];
+						$('article').each(function(){
+							var art_id = $(this).attr('id');
+							var exp = art_id.split('-');
+							art_id = parseInt(exp[1]);
+							
+							if(p_id == art_id) {
+								$(this).attr('data-ismapped-email', email);
+							}
+						});
+					}
+				});
+			} else {
+				$(create_IS_customer_modal).appendTo('body');
 
 				setTimeout(function(){
-					createISCustomerModal.find('#fname').focus();
-				}, 100);
-			}, 200);
+					var createISCustomerModal = $('#ISCreateCustomer');
+					createISCustomerModal.find('.mapped-email').text(mapped_email);
+					createISCustomerModal.find('#email').val(mapped_email);
+					createISCustomerModal.modal('show');
+
+					setTimeout(function(){
+						createISCustomerModal.find('#fname').focus();
+					}, 100);
+				}, 200);
+			}
+		}
+	} else {
+		if($('.gform_wrapper .gform_footer').length) {
+			var alertMsg = "<div class='alert alert-danger'>"+
+			          "Form submission with InfusionSoft Products is not available. Gravity to InfusionSoft license key is invalid!"+
+			        "</div>";
+
+			$('.gform_wrapper .gform_footer').find('.gform_button.button').hide();
+			$('.gform_wrapper .gform_footer').prepend(alertMsg);
 		}
 	}
 

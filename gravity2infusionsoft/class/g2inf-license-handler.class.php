@@ -10,7 +10,8 @@ class G2Inf_License_Handler {
     private $item_shortname;
     private $version;
     private $author;
-    private $api_url = 'http://beta.gravity2pdf.com/';
+    //private $api_url = 'http://beta.gravity2pdf.com/';
+    private $api_url = 'https://www.ninja2pdf.com/';
 
     public function __construct( $_file, $_item_name, $_version, $_author, $_optname = null, $_api_url = null, $_item_id = null ) {
         $this->file = $_file;
@@ -20,7 +21,7 @@ class G2Inf_License_Handler {
             $this->item_id = absint( $_item_id );
         }
 
-        $this->item_shortname = 'ninja2pdf_' . preg_replace( '/[^a-zA-Z0-9_\s]/', '', str_replace( ' ', '_', strtolower( $this->item_name ) ) );
+        $this->item_shortname = 'g2inf_' . preg_replace( '/[^a-zA-Z0-9_\s]/', '', str_replace( ' ', '_', strtolower( $this->item_name ) ) );
         $this->version        = $_version;
         $this->license        = trim( $this->item_shortname . '_license_key');
         $this->author         = $_author;
@@ -39,7 +40,7 @@ class G2Inf_License_Handler {
 
     private function hooks() {
         // Register settings
-        add_filter( 'ninja2pdf_settings_licenses', array( $this, 'settings' ), 1 );
+        add_filter( 'g2inf_settings_licenses', array( $this, 'settings' ), 1 );
 
         // Activate license key on settings save
         add_action( 'admin_init', array( $this, 'activate_license' ) );
@@ -61,7 +62,7 @@ class G2Inf_License_Handler {
         $edd_license_settings = array(
             array(
                 'id'      => $this->item_shortname . '_license_key',
-                'name'    => sprintf( __( '%1$s', 'ninja-pdf' ), $this->item_name ),
+                'name'    => sprintf( __( '%1$s', 'g2inf' ), $this->item_name ),
                 'desc'    => '',
                 'type'    => 'license_key',
                 'options' => array( 'is_valid_license_option' => $this->item_shortname . '_license_active' ),
@@ -74,7 +75,7 @@ class G2Inf_License_Handler {
 
     public function activate_license() {
 
-        if ( ! isset( $_POST['ninja2pdf_settings'] ) ) {
+        if ( ! isset( $_POST['g2inf_licenses'] ) ) {
             return;
         }
 
@@ -88,7 +89,7 @@ class G2Inf_License_Handler {
             return;
         }
 
-        if ( empty( $_POST['ninja2pdf_settings'][ $this->item_shortname . '_license_key'] ) ) {
+        if ( empty( $_POST['g2inf_licenses'][ $this->item_shortname . '_license_key'] ) ) {
 
             delete_option( $this->item_shortname . '_license_active' );
 
@@ -109,7 +110,7 @@ class G2Inf_License_Handler {
             return;
         }
 
-        $license = sanitize_text_field( $_POST['ninja2pdf_settings'][ $this->item_shortname . '_license_key'] );
+        $license = sanitize_text_field( $_POST['g2inf_licenses'][ $this->item_shortname . '_license_key'] );
 
         if( empty( $license ) ) {
             return;
@@ -149,15 +150,15 @@ class G2Inf_License_Handler {
 
     public function deactivate_license() {
 
-        if ( ! isset( $_POST['ninja2pdf_settings'] ) )
+        if ( ! isset( $_POST['g2inf_licenses'] ) )
             return;
 
-        if ( ! isset( $_POST['ninja2pdf_settings'][ $this->item_shortname . '_license_key'] ) )
+        if ( ! isset( $_POST['g2inf_licenses'][ $this->item_shortname . '_license_key'] ) )
             return;
 
         if( ! wp_verify_nonce( $_REQUEST[ $this->item_shortname . '_license_key-nonce'], $this->item_shortname . '_license_key-nonce' ) ) {
 
-            wp_die( __( 'Nonce verification failed', 'ninja-pdf' ), __( 'Error', 'ninja-pdf' ), array( 'response' => 403 ) );
+            wp_die( __( 'Nonce verification failed', 'g2inf' ), __( 'Error', 'g2inf' ), array( 'response' => 403 ) );
 
         }
 
@@ -201,7 +202,7 @@ class G2Inf_License_Handler {
 
     public function weekly_license_check() {
 
-        if( ! empty( $_POST['ninja2pdf_settings'] ) ) {
+        if( ! empty( $_POST['g2inf_licenses'] ) ) {
             return; // Don't fire when saving settings
         }
 
@@ -280,8 +281,8 @@ class G2Inf_License_Handler {
             if( empty( $_GET['tab'] ) || 'licenses' !== $_GET['tab'] ) {
 
                 $messages[] = sprintf(
-                    __( 'You have invalid or expired license keys for Ninja Forms to PDF. Please go to the <a href="%s">Licenses page</a> to correct this issue.', 'easy-digital-downloads' ),
-                    admin_url( 'edit.php?post_type=ninja_merge&page=ninja2pdf-settings&tab=licenses' )
+                    __( 'You have invalid or expired license keys for Gravity to InfusionSoft. Please go to the <a href="%s">Licenses page</a> to correct this issue.', 'easy-digital-downloads' ),
+                    admin_url( 'edit.php?post_type=birchtree_g2inf&page=g2inf-settings&tab=licenses' )
                 );
 
                 $showed_invalid_message = true;

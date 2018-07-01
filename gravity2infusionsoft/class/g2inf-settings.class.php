@@ -13,6 +13,7 @@ class G2inf_Settings {
 
     public function register_settings() {
         register_setting( 'g2inf_settings', 'g2inf_settings', '' );
+        register_setting( 'g2inf_licenses', 'g2inf_licenses', '' );
     }
 
     public function admin_menus(){
@@ -25,6 +26,7 @@ class G2inf_Settings {
             include_once(G2INF_PATH_INCLUDES . '/g2inf_register_account.php');
         } else {
             $g2inf_settings = get_option('g2inf_settings');
+            $g2inf_licenses = get_option('g2inf_licenses');
             include_once(G2INF_PATH_INCLUDES . '/g2inf-addons.php');
         }
     }

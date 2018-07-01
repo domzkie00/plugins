@@ -6,8 +6,12 @@ if ( ! function_exists( 'g2infusion_license_key_callback' ) ) {
         $license  = get_option( $args['options']['is_valid_license_option'] );
 
         
-        $ninja2pdf_settings = get_option('ninja2pdf_settings');
-        $value = $ninja2pdf_settings[$args['id']];
+        $g2inf_licenses = get_option('g2inf_licenses');
+        $value = $g2inf_licenses[$args['id']];
+        /*$value = null;
+        if(isset($g2inf_settings[$args['id']])) {
+            $value = $g2inf_settings[$args['id']];
+        }*/
 
         if( ! empty( $license ) && is_object( $license ) ) {
 
@@ -20,7 +24,7 @@ if ( ! function_exists( 'g2infusion_license_key_callback' ) ) {
 
                         $class = 'expired';
                         $messages[] = sprintf(
-                            __( 'Your license key expired on %s. Please <a href="%s" target="_blank">renew your license key</a>.', 'ninja-pdf' ),
+                            __( 'Your license key expired on %s. Please <a href="%s" target="_blank">renew your license key</a>.', 'g2inf' ),
                             date_i18n( get_option( 'date_format' ), strtotime( $license->expires, current_time( 'timestamp' ) ) ),
                             'http://www.ninja2pdf.com/checkout/?edd_license_key=' . $value . '&utm_campaign=admin&utm_source=licenses&utm_medium=expired'
                         );
@@ -33,7 +37,7 @@ if ( ! function_exists( 'g2infusion_license_key_callback' ) ) {
 
                         $class = 'error';
                         $messages[] = sprintf(
-                            __( 'Your license key has been disabled. Please <a href="%s" target="_blank">contact support</a> for more information.', 'ninja-pdf' ),
+                            __( 'Your license key has been disabled. Please <a href="%s" target="_blank">contact support</a> for more information.', 'g2inf' ),
                             'http://www.ninja2pdf.com/support?utm_campaign=admin&utm_source=licenses&utm_medium=revoked'
                         );
 
@@ -45,7 +49,7 @@ if ( ! function_exists( 'g2infusion_license_key_callback' ) ) {
 
                         $class = 'error';
                         $messages[] = sprintf(
-                            __( 'Invalid license. Please <a href="%s" target="_blank">visit your account page</a> and verify it.', 'ninja-pdf' ),
+                            __( 'Invalid license. Please <a href="%s" target="_blank">visit your account page</a> and verify it.', 'g2inf' ),
                             'http://www.ninja2pdf.com/your-account?utm_campaign=admin&utm_source=licenses&utm_medium=missing'
                         );
 
@@ -58,7 +62,7 @@ if ( ! function_exists( 'g2infusion_license_key_callback' ) ) {
 
                         $class = 'error';
                         $messages[] = sprintf(
-                            __( 'Your %s is not active for this URL. Please <a href="%s" target="_blank">visit your account page</a> to manage your license key URLs.', 'ninja-pdf' ),
+                            __( 'Your %s is not active for this URL. Please <a href="%s" target="_blank">visit your account page</a> to manage your license key URLs.', 'g2inf' ),
                             $args['name'],
                             'http://www.ninja2pdf.com/your-account?utm_campaign=admin&utm_source=licenses&utm_medium=invalid'
                         );
@@ -70,7 +74,7 @@ if ( ! function_exists( 'g2infusion_license_key_callback' ) ) {
                     case 'item_name_mismatch' :
 
                         $class = 'error';
-                        $messages[] = sprintf( __( 'This appears to be an invalid license key for %s.', 'ninja-pdf' ), $args['name'] );
+                        $messages[] = sprintf( __( 'This appears to be an invalid license key for %s.', 'g2inf' ), $args['name'] );
 
                         $license_status = 'license-' . $class . '-notice';
 
@@ -79,7 +83,7 @@ if ( ! function_exists( 'g2infusion_license_key_callback' ) ) {
                     case 'no_activations_left':
 
                         $class = 'error';
-                        $messages[] = sprintf( __( 'Your license key has reached its activation limit. <a href="%s">View possible upgrades</a> now.', 'ninja-pdf' ), 'http://www.ninja2pdf.com/your-account/' );
+                        $messages[] = sprintf( __( 'Your license key has reached its activation limit. <a href="%s">View possible upgrades</a> now.', 'g2inf' ), 'http://www.ninja2pdf.com/your-account/' );
 
                         $license_status = 'license-' . $class . '-notice';
 
@@ -88,7 +92,7 @@ if ( ! function_exists( 'g2infusion_license_key_callback' ) ) {
                     case 'license_not_activable':
 
                         $class = 'error';
-                        $messages[] = __( 'The key you entered belongs to a bundle, please use the product specific license key.', 'ninja-pdf' );
+                        $messages[] = __( 'The key you entered belongs to a bundle, please use the product specific license key.', 'g2inf' );
 
                         $license_status = 'license-' . $class . '-notice';
                         break;
@@ -96,8 +100,8 @@ if ( ! function_exists( 'g2infusion_license_key_callback' ) ) {
                     default :
 
                         $class = 'error';
-                        $error = ! empty(  $license->error ) ?  $license->error : __( 'unknown_error', 'ninja-pdf' );
-                        $messages[] = sprintf( __( 'There was an error with this license key: %s. Please <a href="%s">contact our support team</a>.', 'ninja-pdf' ), $error, 'http://www.ninja2pdf.com/support' );
+                        $error = ! empty(  $license->error ) ?  $license->error : __( 'unknown_error', 'g2inf' );
+                        $messages[] = sprintf( __( 'There was an error with this license key: %s. Please <a href="%s">contact our support team</a>.', 'g2inf' ), $error, 'http://www.ninja2pdf.com/support' );
 
                         $license_status = 'license-' . $class . '-notice';
                         break;
@@ -117,14 +121,14 @@ if ( ! function_exists( 'g2infusion_license_key_callback' ) ) {
 
                         if( 'lifetime' === $license->expires ) {
 
-                            $messages[] = __( 'License key never expires.', 'ninja-pdf' );
+                            $messages[] = __( 'License key never expires.', 'g2inf' );
 
                             $license_status = 'license-lifetime-notice';
 
                         } elseif( $expiration > $now && $expiration - $now < ( DAY_IN_SECONDS * 30 ) ) {
 
                             $messages[] = sprintf(
-                                __( 'Your license key expires soon! It expires on %s. <a href="%s" target="_blank">Renew your license key</a>.', 'ninja-pdf' ),
+                                __( 'Your license key expires soon! It expires on %s. <a href="%s" target="_blank">Renew your license key</a>.', 'g2inf' ),
                                 date_i18n( get_option( 'date_format' ), strtotime( $license->expires, current_time( 'timestamp' ) ) ),
                                 'http://www.ninja2pdf.com/checkout/?edd_license_key=' . $value . '&utm_campaign=admin&utm_source=licenses&utm_medium=renew'
                             );
@@ -134,7 +138,7 @@ if ( ! function_exists( 'g2infusion_license_key_callback' ) ) {
                         } else {
 
                             $messages[] = sprintf(
-                                __( 'Your license key expires on %s.', 'ninja-pdf' ),
+                                __( 'Your license key expires on %s.', 'g2inf' ),
                                 date_i18n( get_option( 'date_format' ), strtotime( $license->expires, current_time( 'timestamp' ) ) )
                             );
 
@@ -152,7 +156,7 @@ if ( ! function_exists( 'g2infusion_license_key_callback' ) ) {
             $class = 'empty';
 
             $messages[] = sprintf(
-                __( 'To receive updates, please enter your valid %s license key.', 'ninja-pdf' ),
+                __( 'To receive updates, please enter your valid %s license key.', 'g2inf' ),
                 $args['name']
             );
 
@@ -162,13 +166,13 @@ if ( ! function_exists( 'g2infusion_license_key_callback' ) ) {
         // $class .= ' ' . $args['field_class'];
 
         $size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
-        $html = '<input type="text" class="' . sanitize_html_class( $size ) . '-text" id="g2inf_settings[' . g2infusion_sanitize_key( $args['id'] ) . ']" name="g2inf_settings[' . g2infusion_sanitize_key( $args['id'] ) . ']" value="' . esc_attr( $value ) . '"/>';
+        $html = '<input type="text" class="' . sanitize_html_class( $size ) . '-text" id="g2inf_licenses[' . g2infusion_sanitize_key( $args['id'] ) . ']" name="g2inf_licenses[' . g2infusion_sanitize_key( $args['id'] ) . ']" value="' . esc_attr( $value ) . '"/>';
 
         if ( ( is_object( $license ) && 'valid' == $license->license ) || 'valid' == $license ) {
-            $html .= '<input type="submit" class="button-secondary" name="' . $args['id'] . '_deactivate" value="' . __( 'Deactivate License',  'ninja-pdf' ) . '"/>';
+            $html .= '<input type="submit" class="button-secondary" name="' . $args['id'] . '_deactivate" value="' . __( 'Deactivate License',  'g2inf' ) . '"/>';
         }
 
-        $html .= '<label for="g2inf_settings[' . g2infusion_sanitize_key( $args['id'] ) . ']"> '  . wp_kses_post( $args['desc'] ) . '</label>';
+        $html .= '<label for="g2inf_licenses[' . g2infusion_sanitize_key( $args['id'] ) . ']"> '  . wp_kses_post( $args['desc'] ) . '</label>';
 
         if ( ! empty( $messages ) ) {
             foreach( $messages as $message ) {

@@ -1,5 +1,5 @@
 <?php
-$licenses = apply_filters('ninja2pdf_settings_licenses', array());
+$licenses = apply_filters('g2inf_settings_licenses', array());
 ?>
 <br />
 <table class="form-table">
