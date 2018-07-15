@@ -23,6 +23,7 @@
             <input type="email" class="form-control" name="email" id="email" readonly>
           </div>
           <div class="form-group submit-btn-area">
+            <button type="button" class="btn btn-default cancel" data-dismiss="modal">Cancel</button>
             <button type="submit" class="btn btn-success">Submit</button>
             <div class="loader"></div>
           </div>

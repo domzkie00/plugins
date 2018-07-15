@@ -5,6 +5,10 @@
         <h4 class="modal-title">Infusionsoft - Checkout</h4>
       </div>
       <div class="modal-body">
+        <div class='alert alert-danger' id="ccard-error"></div>
+        <div class='alert alert-info note'>
+          Create credit card to complete transaction.
+        </div>
         <form action="/action_page.php">
           <div class="form-group">
             <select class="form-control" name="cardType" id="cardType">
@@ -28,7 +32,8 @@
             <input type="text" class="form-control" name="ccode" id="ccode" placeholder="Security Code" required>
           </div>
           <div class="form-group submit-btn-area">
-            <button type="submit" class="btn btn-success">Submit</button>
+            <button type="button" class="btn btn-default cancel" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success proceed">Submit</button>
             <div class="loader"></div>
           </div>
         </form>

@@ -6,6 +6,7 @@ jQuery(document).ready(function ($) {
 		var exp = form.split('_');
 		var id = exp[1];
 		var values = {};
+		var createISCustomerModal = $('#ISCreateCustomer');
 
 		$('#gform_fields_'+id).find('li').each(function(){
 			$(this).find('.ginput_container').find('input').each(function(){
@@ -23,14 +24,18 @@ jQuery(document).ready(function ($) {
 
 		var article_mapped_email = $(this).closest('article').attr('data-ismapped-email');
 		if(article_mapped_email) {
-			var createISCustomerModal = $('#ISCreateCustomer');
-				createISCustomerModal.find('.mapped-email').text(article_mapped_email);
-				createISCustomerModal.find('#email').val(article_mapped_email);
-				createISCustomerModal.modal('show');
+			createISCustomerModal.find('.mapped-email').text(article_mapped_email);
+			createISCustomerModal.find('#email').val(article_mapped_email);
+			createISCustomerModal.modal('show');
 		}
 
-		if(!article_mapped_email) {
-			$(form).trigger('submit');
+		if(createISCustomerModal.length && !multi_posts) {
+			e.preventDefault();
+			createISCustomerModal.modal('show');
+		} else {
+			if(!article_mapped_email) {
+				$(form).trigger('submit');
+			}
 		}
 	});
 
@@ -165,38 +170,92 @@ jQuery(document).ready(function ($) {
 	}
 
 	if($('.gform_footer .gform_button.button').length) {
-		var gform_id = $('.gform_footer .gform_button.button').closest('form').attr('id');
+		if(multi_posts) {
+			$('article').each(function(){
+				var gform_id = $(this).find('.gform_wrapper form').attr('id');
+
+				$(document).on('submit', '#'+gform_id, function(e){
+					var fields = null;
+					var gform_index = $(this).closest('article').index();
+
+					contact_id = multi_posts[gform_index]['is_id'];
+
+					$(this).find('.ginput_quantity').each(function(){
+						var val = $(this).val();
+						var validateISCCardModal = $('#ISCreditCard');
+
+						validateISCCardModal.find('.submit-btn-area button[type="submit"]').css('opacity', 0);
+						validateISCCardModal.find('.submit-btn-area .loader').fadeIn();
+
+						if(fields === null) {
+							fields = val;
+						} else {
+							fields += ',' + val;
+						}
+					});
+
+					if(!getUrlParameter('cout') && !getUrlParameter('fvals')) {
+						fields = JSON.stringify(fields);
+						fields = fields.replace(/\"/g, "");
+
+						$.post(
+				            g2inf_script.ajaxurl,
+				            { 
+				            action : 'getPostURL',
+				            data: multi_posts[gform_index]['id']
+				            }, 
+				            function( result, textStatus, xhr ) {
+				            	window.location.href = result + "?cout=" + contact_id + "&fvals=" + fields + "&gform_id=" + gform_id;
+				            }).fail(function(error) {
+				                //console.log(error);
+				            }).done(function(e) {
+				                
+				            }
+				        );
+
+						e.preventDefault();
+					}
+				});
+			});
+		} else {
+			var gform_id = $('.gform_footer .gform_button.button').closest('form').attr('id');
 		
-		$(document).on('submit', '#'+gform_id, function(e){
-			var fields = null;
-			$(this).find('.ginput_quantity').each(function(){
-				var val = $(this).val();
-				var validateISCCardModal = $('#ISCreditCard');
+			$(document).on('submit', '#'+gform_id, function(e){
+				var fields = null;
+				$(this).find('.ginput_quantity').each(function(){
+					var val = $(this).val();
+					var validateISCCardModal = $('#ISCreditCard');
 
-				validateISCCardModal.find('.submit-btn-area button[type="submit"]').css('opacity', 0);
-				validateISCCardModal.find('.submit-btn-area .loader').fadeIn();
+					validateISCCardModal.find('.submit-btn-area button[type="submit"]').css('opacity', 0);
+					validateISCCardModal.find('.submit-btn-area .loader').fadeIn();
 
-				if(fields === null) {
-					fields = val;
-				} else {
-					fields += ',' + val;
+					if(fields === null) {
+						fields = val;
+					} else {
+						fields += ',' + val;
+					}
+				});
+
+				if(!getUrlParameter('cout') && !getUrlParameter('fvals')) {
+					fields = JSON.stringify(fields);
+					fields = fields.replace(/\"/g, "");
+					window.location.href = window.location.href + "?cout=" + contact_id + "&fvals=" + fields + "&gform_id=" + gform_id;
+
+					e.preventDefault();
 				}
 			});
-
-			if(!getUrlParameter('cout') && !getUrlParameter('fvals')) {
-				fields = JSON.stringify(fields);
-				fields = fields.replace(/\"/g, "");
-				window.location.href = window.location.href + "?cout=" + contact_id + "&fvals=" + fields + "&gform_id=" + gform_id;
-
-				e.preventDefault();
-			}
-		});
+		}
 	}
 
 	$(document).on('submit', '#ISCreditCard', function(e){
+		var $this = this; 
 		var form_values = $(this).find('form').serializeArray();
 		var gform_id = getUrlParameter('gform_id');
 
+		$('#ccard-error').hide();
+		$(this).find('button.cancel').css({'opacity': 0, 'pointer-events': 'none'});
+		$(this).find('button.proceed').css({'opacity': 0, 'pointer-events': 'none'});
+		$(this).find('.loader').show();
 		form_values.push({name: 'field_values', value: getUrlParameter('fvals')});
 
 		$.post(
@@ -209,11 +268,17 @@ jQuery(document).ready(function ($) {
                 var data = JSON.parse(result);
                 if(data.result) {
                 	$('#'+gform_id).trigger('submit');
+                } else {
+                	$('#ccard-error').html(data.message);
+                	$('#ccard-error').show();
+                	$($this).find('.loader').hide();
+                	$($this).find('button.cancel').removeAttr('style');
+					$($this).find('button.proceed').removeAttr('style');
                 }
             }).fail(function(error) {
-                console.log(error);
-            }).done(function() {
-                
+                //console.log('Invalid Credit Card');
+            }).done(function(e) {
+                //console.log(e);
             }
         );
 

@@ -10,6 +10,7 @@ class G2inf_Products{
         add_action('wp', array($this, 'check_mapped_email_on_post_load'));
         add_action('wp_ajax_createContactToIS', array($this, 'createContactToIS_ajax'));
         add_action('wp_ajax_createContactCCardToIS', array($this, 'createContactCCardToIS_ajax'));
+        add_action('wp_ajax_getPostURL', array($this, 'getPostURL_ajax'));
     }
 
     public function licenseKeyValidAndActivated() {
@@ -132,6 +133,13 @@ class G2inf_Products{
                 <?php
             }
         }
+    }
+
+    public function getPostURL_ajax() {
+        $res_url = get_permalink($_POST['data']);
+        echo $res_url;
+
+        die();
     }
 
     public function pre_submission_handler( $form ) {
@@ -267,7 +275,7 @@ class G2inf_Products{
         $infusionsoft = $this->refreshISToken();
         $res = $infusionsoft->invoices()->validateCreditCard($cardType, $contactID, $cardNumber, $expirationMonth, $expirationYear, $securityCode);
 
-        if($res['Valid'] == true) {
+        if($res['Valid'] == 'true') {
             $values = [
                 'CardType' => $cardType, 
                 'ContactId' => $contactID, 
@@ -277,11 +285,12 @@ class G2inf_Products{
                 'CVV2' => $securityCode
             ];
             $res = $infusionsoft->data()->add('CreditCard', $values);
+
             $_SESSION["is_ccid"] = $res;
             $_SESSION["field_vals"] = $_POST['data'][6]['value'];
             echo json_encode(['result' => true, 'message' => 'Success']);
         } else {
-            echo json_encode(['result' => false, 'message' => 'Credit Card not valid.']);
+            echo json_encode(['result' => false, 'message' => $res['Message']]);
         }
 
         die();
